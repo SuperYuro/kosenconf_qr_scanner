@@ -52,35 +52,37 @@ class _QRViewExampleState extends State<QRViewExample> {
                       Container(
                         margin: const EdgeInsets.all(8),
                         child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.toggleFlash();
-                              setState(() {});
+                          onPressed: () async {
+                            await controller?.toggleFlash();
+                            setState(() {});
+                          },
+                          child: FutureBuilder(
+                            future: controller?.getFlashStatus(),
+                            builder: (context, snapshot) {
+                              return Text('Flash: ${snapshot.data}');
                             },
-                            child: FutureBuilder(
-                              future: controller?.getFlashStatus(),
-                              builder: (context, snapshot) {
-                                return Text('Flash: ${snapshot.data}');
-                              },
-                            )),
+                          ),
+                        ),
                       ),
                       Container(
                         margin: const EdgeInsets.all(8),
                         child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.flipCamera();
-                              setState(() {});
+                          onPressed: () async {
+                            await controller?.flipCamera();
+                            setState(() {});
+                          },
+                          child: FutureBuilder(
+                            future: controller?.getCameraInfo(),
+                            builder: (context, snapshot) {
+                              if (snapshot.data != null) {
+                                return Text(
+                                    'Camera facing ${snapshot.data!.name}');
+                              } else {
+                                return const Text('loading');
+                              }
                             },
-                            child: FutureBuilder(
-                              future: controller?.getCameraInfo(),
-                              builder: (context, snapshot) {
-                                if (snapshot.data != null) {
-                                  return Text(
-                                      'Camera facing ${snapshot.data!.name}');
-                                } else {
-                                  return const Text('loading');
-                                }
-                              },
-                            )),
+                          ),
+                        ),
                       )
                     ],
                   ),
@@ -153,9 +155,12 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
+
     if (!p) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('no Permission')),
+        const SnackBar(
+          content: Text('no Permission'),
+        ),
       );
     }
   }
